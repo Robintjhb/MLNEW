@@ -5,7 +5,14 @@
 # Pytorch
 昨天很高兴，看到了这个，现在重新学习机器学习方面或者说人工智能方面的吧，通过不断的锤炼，做出好用的产品
 
-# pytorch初步：
+## pytorch初步：
+    看着这个进行学习吧，加油：
+    https://www.bilibili.com/video/BV1U54y1E7i6
+    1.安装
+        
+    ![](images/2021-08-05-15-53-10.png)
+
+
 
 
 
@@ -58,8 +65,10 @@
 
     成功后
     可以运行examples上面的例子
+    https://github.com/Robintjhb/opencv4nodejs_test
+    
 
-## 问题：
+## 安装问题：
 process.dlopen：   
     internal/modules/cjs/loader.js:1025 return process.dlopen(module, path.toNamespacedPath(filename));
      
@@ -71,3 +80,26 @@ process.dlopen：
     cmd下：echo %path%
 
     上面两个opencv bin 位置结果这两个要相同：
+
+
+
+应用案例：
+
+# 人脸识别
+
+    1. 输入图片，显示名字
+      看了看opencv4nodejs上面的，与pytorch是两个不同的形式，想想还是用pytorch的来吧：
+      pytorch训练模型，
+      onnx.js加载模型输出结果，
+      在进行3d互动操作
+    
+
+    2.打开手机/网页摄像头， 输入图片，显示名字，显示名字
+        路线就是 
+        opencv截取视频图片，
+        pytorch训练模型，
+        onnx.js加载模型输出结果
+        在进行3d互动操作
+
+
+
