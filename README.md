@@ -11,8 +11,12 @@
 
     看着这个进行学习吧，加油：
     https://www.bilibili.com/video/BV1U54y1E7i6
-    1.安装
-    ![20210806090431.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806090431.png)
+1.安装
+
+ ![20210806090431.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806090431.png)
+
+
+
 
 
 # onnx.js 模型在线学习
