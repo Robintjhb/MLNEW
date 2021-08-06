@@ -1,20 +1,18 @@
 # MLNEW
+
 重新学习机器学习~加油
 保持好，学习的激情与深度，加油
 
-# Pytorch
+#  Pytorch
+
 昨天很高兴，看到了这个，现在重新学习机器学习方面或者说人工智能方面的吧，通过不断的锤炼，做出好用的产品
 
 ## pytorch初步：
+
     看着这个进行学习吧，加油：
     https://www.bilibili.com/video/BV1U54y1E7i6
     1.安装
-        
-    ![](images/2021-08-05-15-53-10.png)
-
-
-
-
+    ![20210806090431.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806090431.png)
 
 
 # onnx.js 模型在线学习
