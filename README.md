@@ -13,7 +13,95 @@
     https://www.bilibili.com/video/BV1U54y1E7i6
 1.安装
 
- ![20210806090431.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806090431.png)
+![20210806111825.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806111825.png)
+
+(1)Anacoda5.3.1---到清华镜像下载
+Anacoda安装目录下面就有python.exe 查看python版本
+![20210806142714.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806142714.png)
+
+(2)cuda版本 查看：
+    
+https://blog.csdn.net/zz2230633069/article/details/103725229
+
+安装包下载地址(先装cuda10吧)：
+
+https://developer.nvidia.com/cuda-10.0-download-archive
+
+安装注意点：
+
+自定义安装：
+
+https://www.pianshen.com/article/4550345762/
+
+![20210806134943.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806134943.png)
+
+运行nvcc -v出现 nvcc fatal : No input files specified; use option --help for more information
+
+    nvcc -V
+
+ 就可以了
+
+(3)安装pytorch：
+
+    conda install pytorch==1.0.0 torchvision==0.2.1 cuda100 -c pytorch
+
+https://pytorch.org/get-started/previous-versions/
+
+
+
+
+
+(4)pycharm下载：选择社区免费版本下载
+
+https://www.jetbrains.com/zh-cn/pycharm/download/#section=windows
+
+![20210806135736.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806135736.png)
+
+(5) 在vscode中运行py文件：
+
+    直接安装python插件，运行，ctrl+alt+n，运行
+
+![20210806172019.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806172019.png)
+
+
+![20210806144904.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806144904.png)
+
+对py文件自动补全：
+
+https://blog.csdn.net/XU18829898203/article/details/106042078
+
+
+
+![20210806171855.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806171855.png)
+
+
+
+
+         // 设置Python的路径
+        "python.pythonPath": "C:/ProgramData/Anaconda3/python",
+        // 设置Python的代码格式化
+        "python.formatting.provider": "yapf",
+        // 设置Python的代码检查
+        "python.linting.flake8Path": "pycodestyle",
+        "python.linting.flake8Enabled": true,
+        "python.autoComplete.extraPaths": [
+            "C:/ProgramData/Anaconda3/",
+            "C:/ProgramData/Anaconda3/Lib/",
+            "C:/ProgramData/Anaconda3/Lib/site-packages/",
+            "C:/ProgramData/Anaconda3/DLLs/"
+        ],
+        "python.autoComplete.addBrackets": true
+
+
+
+
+(6) 安装成功验证：
+
+    print(torch.__version__)  #torch 版本
+
+    print(torch.cuda.is_available())  #是否支持gpu
+
+
 
 
 
