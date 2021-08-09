@@ -74,24 +74,57 @@ https://blog.csdn.net/XU18829898203/article/details/106042078
 
 ![20210806171855.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210806171855.png)
 
+对vscode中python执行，
+    
+（1）进行settings.json中配置：
 
+    // 设置Python的路径
+    "python.pythonPath": "C:/ProgramData/Anaconda3/python",
+    "python.terminal.executeInFileDir": true,
+   
+    //万能运行环境
+    "code-runner.executorMap": {
+        
+        //"python": "set PYTHONIOENCODING=utf8 && C:/ProgramData/Anaconda3/python"
+        "python": "set PYTHONIOENCODING=utf8 && python",
+    },
+    // 设置Python的代码格式化
+    "python.formatting.provider": "yapf",
+    // 设置Python的代码检查
+    "python.linting.flake8Path": "pycodestyle",
+    "python.autoComplete.extraPaths": [
+        "C:/ProgramData/Anaconda3/",
+        "C:/ProgramData/Anaconda3/Lib/",
+        "C:/ProgramData/Anaconda3/Lib/site-packages/",
+        "C:/ProgramData/Anaconda3/DLLs/"
+    ],
+    "python.autoComplete.addBrackets": true,
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "python.analysis.extraPaths": [
+        "C:/ProgramData/Anaconda3/",
+        "C:/ProgramData/Anaconda3/Lib/",
+        "C:/ProgramData/Anaconda3/Lib/site-packages/",
+        "C:/ProgramData/Anaconda3/DLLs/"
+    ],
+    "python.analysis.completeFunctionParens": true,
+    "python.linting.pylintPath": "C:\\ProgramData\\Anaconda3\\pkgs\\pylint-2.1.1-py37_0\\Scripts\\pylint",
+    "code-runner.fileDirectoryAsCwd": true,
 
+（2）在.vscode中添加launch.json文件，并配置：
 
-         // 设置Python的路径
-        "python.pythonPath": "C:/ProgramData/Anaconda3/python",
-        // 设置Python的代码格式化
-        "python.formatting.provider": "yapf",
-        // 设置Python的代码检查
-        "python.linting.flake8Path": "pycodestyle",
-        "python.linting.flake8Enabled": true,
-        "python.autoComplete.extraPaths": [
-            "C:/ProgramData/Anaconda3/",
-            "C:/ProgramData/Anaconda3/Lib/",
-            "C:/ProgramData/Anaconda3/Lib/site-packages/",
-            "C:/ProgramData/Anaconda3/DLLs/"
-        ],
-        "python.autoComplete.addBrackets": true
-
+        {
+            "configurations": [
+                {
+                    "cwd":"${fileDirname}"
+                }
+            ]
+        
+        }
+解决相对路径问题：        
+![20210809092450.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809092450.png)
 
 
 
