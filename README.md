@@ -136,6 +136,104 @@ https://blog.csdn.net/XU18829898203/article/details/106042078
 
 
 
+# 基础概念
+
+## -张量 torch.tensor
+
+https://zhuanlan.zhihu.com/p/265394674
+
+Tensor 的概念
+Tensor 中文为张量。
+
+张量的意思是一个多维数组，它是标量、向量、矩阵的高维扩展。
+
+标量可以称为 0 维张量，向量可以称为 1 维张量，矩阵可以称为 2 维张量，RGB 图像可以表示 3 维张量。你可以把张量看作多维数组。
+
+![20210809094100.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809094100.png)
+
+Tensor 创建的方法
+
+直接创建 Tensor
+
+torch.tensor()
+
+torch.tensor(data, dtype=None, device=None, requires_grad=False, pin_memory=False)
+
+    data: 数据，可以是 list，numpy
+
+    dtype: 数据类型，默认与 data 的一致
+
+    device: 所在设备，cuda/cpu
+
+    requires_grad: 是否需要梯度
+
+    pin_memory: 是否存于锁页内存
+
+代码示例：
+
+    arr = np.ones((3, 3))
+    print("ndarray的数据类型：", arr.dtype)
+    # 创建存放在 GPU 的数据
+    # t = torch.tensor(arr, device='cuda')
+    t= torch.tensor(arr)
+    print(t)
+    
+输出为：
+
+
+
+索引与切片
+
+![20210809143446.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809143446.png)
+
+
+![20210809144314.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809144314.png)
+
+间隔索引：
+
+![20210809144803.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809144803.png)
+
+index_select--？这个在想想看吧
+
+![20210809155055.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809155055.png)
+
+...:
+
+![20210809155539.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809155539.png)
+
+![20210809155817.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809155817.png)
+
+![20210809155926.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809155926.png)
+
+维度变换：
+
+![20210809160057.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809160057.png)
+
+
+![20210809160642.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809160642.png)
+
+
+![20210809161718.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809161718.png)
+
+维度扩张：
+unsqueeze(正数)：在前面加上维度：
+
+![20210809161959.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809161959.png)
+
+
+维度删减：
+
+![20210809162547.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809162547.png)
+
+维度扩展：设置为-1时候，不变换
+
+![20210809163006.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809163006.png)
+
+
+
+
+
+
 
 
 

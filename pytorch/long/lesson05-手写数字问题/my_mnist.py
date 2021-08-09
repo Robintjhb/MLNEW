@@ -4,3 +4,7 @@
 import torch
 
 
+def fu():
+    print("哈哈，写代码吧")
+
+fu()
