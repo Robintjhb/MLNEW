@@ -225,12 +225,238 @@ unsqueeze(正数)：在前面加上维度：
 
 ![20210809162547.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809162547.png)
 
+
 维度扩展：设置为-1时候，不变换
 
 ![20210809163006.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809163006.png)
 
+repeat：
+
+![20210809172853.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809172853.png)
 
 
+矩阵转置：.t
+
+![20210809173100.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210809173100.png)
+
+Transpose
+
+![20210810093056.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810093056.png)
+
+
+
+permute:--维度转换，提前或者后移：
+
+![20210810093342.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810093342.png)
+
+
+
+Broadcast自动扩展：
+
+        Expand ，
+        without copying data
+ 
+维度变换后，相加：       
+![20210810094650.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810094650.png)
+
+
+    a = torch.rand(4, 32, 14, 14)
+    b = torch.rand(1, 32, 1, 1)
+    c = torch.rand(32, 1, 1)
+
+    # b [1, 32, 1, 1]=>[4, 32, 14, 14]
+    print((a + b).shape)
+    print((a+c).shape)
+
+拼接/合并：
+torch.cat
+
+![20210810110222.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810110222.png)
+
+
+![20210810110907.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810110907.png)
+
+torch.stack:
+
+![20210810111232.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810111232.png)
+
+拆分：
+
+▪ Split 按长度进行拆分
+
+    aa, bb = c.split(1, dim=0)
+    print(aa.shape, bb.shape)
+
+
+![20210810112543.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810112543.png)
+
+
+
+▪ Chunk 按数量 进行 拆分
+
+    aa, bb = c.chunk(2, dim=0)  # 按2个数量 进行拆分---》拆分成两个
+    print(aa.shape, bb.shape)
+
+
+基本运算：
+
+![20210810113215.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810113215.png)
+
+加减乘除：
+
+![20210810113551.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810113551.png)
+
+矩阵乘法：.matmul  @
+
+![20210810113829.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810113829.png)
+
+示例分析：
+把4x784 转换为4x512矩阵，
+--可以把神经网络学习理解tensor的不断变换的过程--tensor flow的流动
+
+![20210810114601.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810114601.png)
+
+![20210810120000.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810120000.png)
+
+次方运算：pow
+
+![20210810133225.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810133225.png)
+
+
+幂次方：exp，log
+
+![20210810134316.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810134316.png)
+
+其他：
+![20210810134437.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810134437.png)
+
+
+torch.clamp
+
+将输入input张量每个元素的夹紧到区间 [min,max]内，并返回结果到一个新张量。
+
+    a = torch.randint(low=0, high=10, size=(10, 1))
+    print(a)
+    a = torch.clamp(a, 3, 9)  # 会把低于3的变为3，把高于9的变为9，数组数量不变
+    print(a)
+
+
+统计属性：
+
+![20210810140737.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810140737.png)
+
+![20210810141559.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810141559.png)
+
+Tensor求和以及按索引求和：torch.sum() torch.Tensor.indexadd()
+
+Tensor元素乘积：torch.prod(input) ---
+
+对Tensor求均值、方差、极值：
+
+torch.mean() torch.var()
+
+torch.max() torch.min()
+
+dim,keepdim:维度，求max，argmax
+
+![20210810145541.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810145541.png)
+
+topk kthvalue：
+
+![20210810150239.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810150239.png)
+
+比较：
+
+![20210810150722.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810150722.png)
+
+其他：
+where：
+
+![20210810151412.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810151412.png)
+
+gather：收集--就是通过索引号，取值
+
+![20210810161134.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810161134.png)
+
+## 梯度：-----重要
+
+什么是梯度：所有偏微分的总和。偏微分：自变量的导数
+
+![20210810161750.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810161750.png)
+
+梯度是有长度，及方向的向量；表现了f(x,y) 在x，y的数值变化，增长的速率：
+![20210810162216.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810162216.png)
+
+
+![20210810164353.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810164353.png)
+
+![20210810164656.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810164656.png)
+
+![20210810164851.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810164851.png)
+
+局部最小点较多--通过连接网络，达到极小值：
+
+![20210810165220.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810165220.png)
+
+
+马鞍形：一个方向为最小值，一个方向为最大值：鞍点
+
+![20210810165416.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810165416.png)
+
+
+找到极值点的影响因素：
+
+![20210810165848.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810165848.png)
+
+初始状态：
+
+    何恺明，初始化状态： https://arxiv.org/pdf/1502.01852.pdf
+
+![20210810170249.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810170249.png)
+
+
+
+学习率
+
+![20210810171558.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810171558.png)
+
+
+
+动速
+如何逃出局部最小值：
+
+![20210810171739.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810171739.png)
+
+
+常见函数梯度：
+
+常见函数：
+
+![20210810171920.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810171920.png)
+
+线性函数 y=wx+b---对w，b进行偏微分求解--》x+1
+
+![20210810172112.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810172112.png)
+
+![20210810172304.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810172304.png)
+
+![20210810172406.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810172406.png)
+
+
+![20210810172628.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810172628.png)
+
+![20210810172649.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810172649.png)
+
+![20210810172752.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810172752.png)
+
+
+##  激活函数及梯度
+
+
+![20210810173113.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810173113.png)
+
+
+![20210810173232.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810173232.png)：
 
 
 
