@@ -366,9 +366,60 @@ a.requires_grad_()  # 更新求导
 
 p = F.softmax(a, dim=0)  # softmax 函数：预测值：a，dim对那个维度进行
 
-autograd = torch.autograd.grad(p[1], [a], retain_graph=True)# p[1]:对第i个进行，[a]:变量 retain_graph声明求导
+autograd = torch.autograd.grad(p[1], [a], retain_graph=True)  # p[1]:对第i个进行，[a]:变量 retain_graph声明求导
 
 print(autograd)  # (tensor([-0.0736,  0.1604, -0.0868]),)
 
 autograd = torch.autograd.grad(p[2], [a])  # retain_graph声明求导
 print(autograd)  # (tensor([-0.1586, -0.0868,  0.2455]),)
+
+# 单层 感知机 模型：实现
+x = torch.randn(1, 10)
+w = torch.randn(1, 10, requires_grad=True)
+
+o = torch.sigmoid(x @ w.t())  # 激活函数
+
+print(o)
+
+loss = F.mse_loss(torch.ones(1, 1), o)  # loss函数 mse
+
+loss.backward()  # 后向传播
+
+w_grad = w.grad
+print(w_grad)  # 得到w的导数
+
+# 多层 感知机
+x = torch.randn(1, 10)
+w = torch.randn(2, 10, requires_grad=True)  # 2层的
+
+o = torch.sigmoid(x @ w.t())  # 激活函数
+
+print(o)
+
+loss = F.mse_loss(torch.ones(1, 2), o)  # loss函数 mse
+
+loss.backward()  # 后向传播
+
+w_grad = w.grad
+print(w_grad)  # 得到w的导数 2x10 的导数 结果
+
+# 链式法则
+x = torch.tensor(1.)
+w1 = torch.tensor(2., requires_grad=True)
+b1 = torch.tensor(1.)
+w2 = torch.tensor(2., requires_grad=True)
+b2 = torch.tensor(1.)
+
+y1 = x * w1 + b1
+y2 = y1 * w2 + b2
+
+# 求导
+dy2_dy1 = torch.autograd.grad(y2, [y1])[0]
+dy1_dw1 = torch.autograd.grad(y1, [w1])[0]
+
+dy2_dw1 = dy2_dy1 * dy1_dw1  # 手动 链式求导
+print(dy2_dw1)
+
+# dy2_dw1_n = torch.autograd.grad(y2, [w1])[0]  # 直接使用torch提供的求导
+#
+# print(dy2_dw1_n)

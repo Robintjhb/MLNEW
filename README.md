@@ -617,12 +617,110 @@ torch实现：
 
 torch实现：
 
+
+    # 单层 感知机 模型：实现
+    x = torch.randn(1, 10)
+    w = torch.randn(1, 10, requires_grad=True)
+
+    o = torch.sigmoid(x @ w.t())  # 激活函数
+
+    print(o)
+
+    loss = F.mse_loss(torch.ones(1, 1), o)  # loss函数 mse
+
+    loss.backward()  # 后向传播
+
+    w_grad = w.grad
+    print(w_grad)  # 得到w的导数
+
+
 ![20210811135003.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811135003.png)
 
 
+多层感知机：多层网络
+
+![20210811141808.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811141808.png)
+
+![20210811142016.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811142016.png)
+
+torch实现：
+        
+    #多层 感知机
+    x = torch.randn(1, 10)
+    w = torch.randn(2, 10, requires_grad=True) # 2层的
+
+    o = torch.sigmoid(x @ w.t())  # 激活函数
+
+    print(o)
+
+    loss = F.mse_loss(torch.ones(1, 2), o)  # loss函数 mse
+
+    loss.backward()  # 后向传播
+
+    w_grad = w.grad
+    print(w_grad)  # 得到w的导数 2x10 的导数 结果
 
 
+## 链式法则
 
+链式法则是微积分中的求导法则，用以求一个复合函数的导数。
+所谓的复合函数，是指以一个函数作为另一个函数的自变量。
+
+如设
+f(x)=3x，g(x)=x+3，
+g(f(x))就是一个复合函数，
+并且g(f(x))=3x+3 链式法则(chain rule)
+
+若h(x)=f(g(x))
+
+则h'(x)=f'(g(x))g'(x)
+
+链式法则用文字描述，
+就是“由两个函数凑起来的复合函数，其导数等于里边函数代入外边函数的值之导数，乘以里边函数的导数。
+
+
+![20210811164400.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811164400.png)
+
+![20210811164649.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811164649.png)
+
+各类rule原则：
+![20210811164935.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811164935.png)
+
+![20210811165112.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811165112.png)
+
+乘积原则：
+![20210811165228.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811165228.png)
+
+![20210811165326.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811165326.png)
+
+![20210811165637.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811165637.png)
+
+链式法则过程：
+
+![20210811165920.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811165920.png)
+
+torch实现：
+        
+    # 链式法则
+    x = torch.tensor(1.)
+    w1 = torch.tensor(2., requires_grad=True)
+    b1 = torch.tensor(1.)
+    w2 = torch.tensor(2., requires_grad=True)
+    b2 = torch.tensor(1.)
+
+    y1 = x * w1 + b1
+    y2 = y1 * w2 + b2
+
+    # 求导
+    dy2_dy1 = torch.autograd.grad(y2, [y1])[0]
+    dy1_dw1 = torch.autograd.grad(y1, [w1])[0]
+
+    dy2_dw1 = dy2_dy1 * dy1_dw1  # 手动 链式求导
+    print(dy2_dw1)
+
+    # dy2_dw1_n = torch.autograd.grad(y2, [w1])[0]  # 直接使用torch提供的求导
+    #
+    # print(dy2_dw1_n)
 
 
 
