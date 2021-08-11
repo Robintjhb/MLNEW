@@ -455,8 +455,176 @@ gather：收集--就是通过索引号，取值
 
 ![20210810173113.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810173113.png)
 
+这样的激活函数不可导
 
-![20210810173232.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810173232.png)：
+![20210810173232.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810173232.png)
+
+解决不可导，提出了这样的函数：
+
+sigmoid函数：
+
+![20210811092323.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811092323.png)
+
+σ(sigmoid)的倒数是 σ'=σ*(1-σ)
+![20210811092635.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811092635.png)
+
+但在正负无穷的时候，σ' 趋近于0，导致导数迷散
+
+![20210811093040.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811093040.png)
+
+torch 中使用：
+
+
+    from torch.nn import functional as F #函数接口
+
+    # σ(sigmoid)
+    a = torch.linspace(-100, 100, 10)
+    print(a)
+
+    # (sigmoid)
+    sigmoid_σ = torch.sigmoid(a)
+
+    print(sigmoid_σ)
+
+
+
+
+![20210811093137.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811093137.png)
+
+
+tanh函数：在RNN中使用
+
+![20210811094340.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811094340.png)
+
+tanh的导数：x从正负无穷，y从-1，1
+
+![20210811094526.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811094526.png)
+
+在torch中使用
+
+![20210811094710.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811094710.png)
+
+Rectified Linear Unit 整型的线性单元---ReLU
+
+![20210811095032.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811095032.png)
+
+![20210811095238.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811095238.png)
+ 
+ torch中使用：
+    # ReLU函数
+
+    a=torch.linspace(-1, 1, 10)
+    relu = torch.relu(a)
+
+    print(relu)
+    # tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.1111, 0.3333, 0.5556, 0.7778,
+    #         1.0000])
+
+
+![20210811095401.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811095401.png)
+
+## LOSS及其梯度：
+
+![20210811095735.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811095735.png)
+
+经典loss
+![20210811095944.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811095944.png)
+
+均方差MSE:
+有3种
+
+![20210811100247.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811100247.png)
+
+求导：
+
+![20210811101537.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811101537.png)
+
+torch自动求导：
+        
+    # 均方差MSE:求导
+    x = torch.ones(1)
+    w = torch.full([1], 2)
+    # loss 值
+    mse = F.mse_loss(torch.ones(1), x * w)  # torch.one(1)预测值，x*w计算值
+
+    w.requires_grad_()  # 更新求导
+     # 第1种方法
+    mse = F.mse_loss(torch.ones(1), x * w)  # 重新计算   
+    autograd = torch.autograd.grad(mse, [w])
+    print(autograd)  # (tensor([2.]),)
+
+    # 第二种方法
+    mse = F.mse_loss(torch.ones(1), x * w)  # 重新计算
+    mse.backward()  # 向后传播
+    w_grad = w.grad
+    print(w_grad)
+
+
+![20210811102417.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811102417.png)
+
+第2种方法
+![20210811103901.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811103901.png)
+
+![20210811104553.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811104553.png)
+
+分类问题--求出概率
+softmax: soft version of max
+
+![20210811105353.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811105353.png)
+
+i=j
+
+![20210811105850.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811105850.png)
+
+i不等于j
+
+![20210811110114.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811110114.png)
+
+![20210811110411.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811110411.png)
+
+torch实现：
+
+    # 分类问题--softmax函数
+    a = torch.rand(3)
+    a.requires_grad_()  # 更新求导
+
+    p = F.softmax(a, dim=0)  # softmax 函数：预测值：a，dim对那个维度进行
+
+    autograd = torch.autograd.grad(p[1], [a], retain_graph=True)# p[1]:对第i个进行，[a]:变量 retain_graph声明求导
+
+    print(autograd)  # (tensor([-0.0736,  0.1604, -0.0868]),)
+
+    autograd = torch.autograd.grad(p[2], [a])  # retain_graph声明求导
+    print(autograd)  # (tensor([-0.1586, -0.0868,  0.2455]),)
+
+
+
+![20210811112302.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811112302.png)
+
+## 感知机：
+
+![20210811114124.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811114124.png)
+
+单层 感知机 模型：
+
+![20210811114352.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811114352.png)
+
+![20210811115449.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811115449.png)
+
+![20210811120025.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811120025.png)
+
+![20210811134442.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811134442.png)
+
+torch实现：
+
+![20210811135003.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811135003.png)
+
+
+
+
+
+
+
 
 
 

@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from torch.nn import functional as F  # 函数接口
 
 # 张量 概念
 
@@ -320,3 +321,54 @@ print(a.max(dim=1, keepdim=True))  # 保留维度，来求最大值,返回值及
 #         [2],
 #         [1],
 #         [1]]))
+
+# 激活函数
+# σ(sigmoid)
+a = torch.linspace(-100, 100, 10)
+print(a)
+
+# (sigmoid)
+sigmoid_σ = torch.sigmoid(a)
+
+print(sigmoid_σ)
+
+# ReLU函数
+
+a = torch.linspace(-1, 1, 10)
+relu = torch.relu(a)
+
+print(relu)
+# tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.1111, 0.3333, 0.5556, 0.7778,
+#         1.0000])
+
+# loss
+# 均方差MSE:求导
+x = torch.ones(1)
+w = torch.full([1], 2)
+# loss 值
+mse = F.mse_loss(torch.ones(1), x * w)  # torch.one(1)预测值，x*w计算值
+
+w.requires_grad_()  # 更新求导
+mse = F.mse_loss(torch.ones(1), x * w)  # 重新计算
+
+autograd = torch.autograd.grad(mse, [w])
+print(autograd)  # (tensor([2.]),)
+
+# 第二种方法
+mse = F.mse_loss(torch.ones(1), x * w)  # 重新计算
+mse.backward()  # 向后传播
+w_grad = w.grad
+print(w_grad)
+
+# 分类问题--softmax函数
+a = torch.rand(3)
+a.requires_grad_()  # 更新求导
+
+p = F.softmax(a, dim=0)  # softmax 函数：预测值：a，dim对那个维度进行
+
+autograd = torch.autograd.grad(p[1], [a], retain_graph=True)# p[1]:对第i个进行，[a]:变量 retain_graph声明求导
+
+print(autograd)  # (tensor([-0.0736,  0.1604, -0.0868]),)
+
+autograd = torch.autograd.grad(p[2], [a])  # retain_graph声明求导
+print(autograd)  # (tensor([-0.1586, -0.0868,  0.2455]),)
