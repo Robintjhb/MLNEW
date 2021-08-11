@@ -722,11 +722,20 @@ torch实现：
     #
     # print(dy2_dw1_n)
 
+## Multi-Layer Perceptron(MLP) 多层网络 反向传播：
+
+![20210811172410.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811172410.png)
 
 
+![20210811172605.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811172605.png)
+
+多层网络求导：
+
+![20210811173052.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811173052.png)
 
 
-
+https://www.bilibili.com/video/BV1U54y1E7i6?p=44&spm_id_from=pageDriver
+05：50
 
 
 
