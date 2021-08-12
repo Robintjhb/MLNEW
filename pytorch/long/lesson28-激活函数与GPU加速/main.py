@@ -1,13 +1,12 @@
-import  torch
-import  torch.nn as nn
-import  torch.nn.functional as F
-import  torch.optim as optim
-from    torchvision import datasets, transforms
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torchvision import datasets, transforms
 
-
-batch_size=200
-learning_rate=0.01
-epochs=10
+batch_size = 200
+learning_rate = 0.01
+epochs = 10
 
 train_loader = torch.utils.data.DataLoader(
     datasets.MNIST('../data', train=True, download=True,
@@ -24,10 +23,6 @@ test_loader = torch.utils.data.DataLoader(
     batch_size=batch_size, shuffle=True)
 
 
-
-
-
-
 class MLP(nn.Module):
 
     def __init__(self):
@@ -35,7 +30,7 @@ class MLP(nn.Module):
 
         self.model = nn.Sequential(
             nn.Linear(784, 200),
-            nn.LeakyReLU(inplace=True),
+            nn.LeakyReLU(inplace=True), #激活函数
             nn.Linear(200, 200),
             nn.LeakyReLU(inplace=True),
             nn.Linear(200, 10),
@@ -47,16 +42,17 @@ class MLP(nn.Module):
 
         return x
 
-device = torch.device('cuda:0')
-net = MLP().to(device)
+
+device = torch.device('cuda:0') #gpu 加速 只有一个cuda显卡直接写为0
+net = MLP().to(device)#gpu 加速
 optimizer = optim.SGD(net.parameters(), lr=learning_rate)
-criteon = nn.CrossEntropyLoss().to(device)
+criteon = nn.CrossEntropyLoss().to(device)#gpu 加速
 
 for epoch in range(epochs):
 
     for batch_idx, (data, target) in enumerate(train_loader):
-        data = data.view(-1, 28*28)
-        data, target = data.to(device), target.cuda()
+        data = data.view(-1, 28 * 28)
+        data, target = data.to(device), target.cuda() #gpu 加速
 
         logits = net(data)
         loss = criteon(logits, target)
@@ -71,12 +67,11 @@ for epoch in range(epochs):
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                        100. * batch_idx / len(train_loader), loss.item()))
 
-
     test_loss = 0
     correct = 0
     for data, target in test_loader:
         data = data.view(-1, 28 * 28)
-        data, target = data.to(device), target.cuda()
+        data, target = data.to(device), target.cuda()#gpu 加速
         logits = net(data)
         test_loss += criteon(logits, target).item()
 

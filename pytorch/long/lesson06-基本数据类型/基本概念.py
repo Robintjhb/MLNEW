@@ -423,3 +423,18 @@ print(dy2_dw1)
 # dy2_dw1_n = torch.autograd.grad(y2, [w1])[0]  # 直接使用torch提供的求导
 #
 # print(dy2_dw1_n)
+
+
+# 交叉熵
+
+x = torch.randn(1, 784)
+w = torch.randn(10, 784)
+
+logits = x @ w.t()
+pred = F.softmax(logits, dim=1)
+pred_log = torch.log(pred)
+
+ce1 = F.nll_loss(pred_log, torch.tensor([3]))
+print(ce1)
+ce2 = F.cross_entropy(logits, torch.tensor([3]))
+print(ce2)

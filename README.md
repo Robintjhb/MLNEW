@@ -357,7 +357,10 @@ torch.mean() torch.var()
 
 torch.max() torch.min()
 
-dim,keepdim:维度，求max，argmax
+dim,keepdim:维度，
+求
+max，返回指定维度的最大值，及 索引。
+argmax：返回指定维度的最大值的索引。
 
 ![20210810145541.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210810145541.png)
 
@@ -729,13 +732,571 @@ torch实现：
 
 ![20210811172605.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811172605.png)
 
-多层网络求导：
+![20210812085749.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812085749.png)
+
+### 多层网络求导：当前层导数信息 乘以 后面层的导数信息之和。
+
 
 ![20210811173052.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210811173052.png)
 
+![20210812090335.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812090335.png)
 
-https://www.bilibili.com/video/BV1U54y1E7i6?p=44&spm_id_from=pageDriver
-05：50
+![20210812090540.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812090540.png)
+
+![20210812091220.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812091220.png)
+
+![20210812091614.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812091614.png)
+
+
+## 2d 函数优化
+
+![20210812091838.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812091838.png)
+
+示例：
+
+![20210812091932.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812091932.png)
+
+![20210812092113.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812092113.png)
+
+python 实现函数，绘制图形：
+
+![20210812092301.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812092301.png)
+
+torch迭代，找到最小值：
+
+![20210812093207.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812093207.png)
+   
+    import numpy as np
+    from mpl_toolkits.mplot3d import Axes3D
+    from matplotlib import pyplot as plt
+    import torch
+
+
+    # 2d 函数
+    def himmelblau(x):
+        return (x[0] ** 2 + x[1] - 11) ** 2 + (x[0] + x[1] ** 2 - 7) ** 2
+
+
+    x = np.arange(-6, 6, 0.1)
+    y = np.arange(-6, 6, 0.1)  # 先指定范围
+    print('x,y range:', x.shape, y.shape)
+    X, Y = np.meshgrid(x, y)
+    print('X,Y maps:', X.shape, Y.shape)
+    Z = himmelblau([X, Y])
+
+    fig = plt.figure('himmelblau')
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(X, Y, Z)
+    ax.view_init(60, -30)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    plt.show()  # plt显示
+
+    # [1., 0.], [-4, 0.], [4, 0.]
+    x = torch.tensor([-4., 0.], requires_grad=True)  # 初始化值
+
+    optimizer = torch.optim.Adam([x], lr=1e-3)  # 使用torch内置的优化函数
+
+    for step in range(20000):  # 迭代
+
+        pred = himmelblau(x)  # 每次迭代值
+
+        optimizer.zero_grad()
+        pred.backward()  # 后向传播，求导
+        optimizer.step()  # 迭代求导
+
+        if step % 2000 == 0:
+            print(pred) 
+            print('step {}: x = {}, f(x) = {}'
+                .format(step, x.tolist(), pred.item()))  # 打印求导结果
+
+
+## 逻辑回归/回归分析 Logistic Regression
+
+![20210812094141.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812094141.png)
+
+![20210812094639.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812094639.png)
+
+![20210812094742.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812094742.png)
+
+![20210812095137.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812095137.png)
+
+不使用最大准确率：
+
+![20210812100650.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812100650.png)
+
+为什么叫逻辑回归：
+
+![20210812101007.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812101007.png)
+
+2分类：
+
+![20210812101055.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812101055.png)
+
+多分类：
+
+![20210812101157.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812101157.png)
+
+softmax引入，更好的找到概率大小的值：
+
+![20210812101322.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812101322.png)
+
+![20210812101354.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812101354.png)
+
+## 经典LOSS:
+
+![20210812101737.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812101737.png)
+
+
+
+## 交叉熵 Cross Entropy Loss
+
+![20210812101632.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812101632.png)
+
+熵：不确定性，惊喜度。
+
+    熵越高，惊喜度越低，越稳定；熵越低，越不稳定，惊喜度越高
+
+![20210812102052.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812102052.png)
+
+![20210812102409.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812102409.png)
+
+二分类的交叉熵：
+
+![20210812103010.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812103010.png)
+
+![20210812103315.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812103315.png)
+
+示例：
+
+![20210812103607.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812103607.png)
+
+对于分类问题，使用交叉熵，不使用MSE均方差：
+
+![20210812104037.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812104037.png)
+
+![20210812104145.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812104145.png)
+
+torch 实现：
+
+![20210812104458.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812104458.png)
+
+    # 交叉熵
+
+    x = torch.randn(1, 784)
+    w = torch.randn(10, 784)
+
+    logits = x @ w.t()
+    pred = F.softmax(logits, dim=1)
+    pred_log = torch.log(pred)
+
+    ce1 = F.nll_loss(pred_log, torch.tensor([3]))
+    print(ce1)
+    ce2 = F.cross_entropy(logits, torch.tensor([3]))
+    print(ce2)
+
+
+## 多分类问题 实战：
+
+![20210812105124.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812105124.png)
+
+![20210812105156.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812105156.png)
+
+    torch 实现：
+
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    import torch.optim as optim
+    from torchvision import datasets, transforms
+
+    batch_size = 200
+    learning_rate = 0.01
+    epochs = 10
+
+    # 训练数据
+    train_loader = torch.utils.data.DataLoader(
+        datasets.MNIST('../data', train=True, download=True,
+                    transform=transforms.Compose([
+                        transforms.ToTensor(),
+                        transforms.Normalize((0.1307,), (0.3081,))
+                    ])),
+        batch_size=batch_size, shuffle=True)
+
+    # 测试数据
+    test_loader = torch.utils.data.DataLoader(
+        datasets.MNIST('../data', train=False, transform=transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,))
+        ])),
+        batch_size=batch_size, shuffle=True)
+
+    # 各层的权重
+    w1, b1 = torch.randn(200, 784, requires_grad=True), \
+            torch.zeros(200, requires_grad=True)
+
+    w2, b2 = torch.randn(200, 200, requires_grad=True), \
+            torch.zeros(200, requires_grad=True)
+
+    w3, b3 = torch.randn(10, 200, requires_grad=True), \
+            torch.zeros(10, requires_grad=True)
+
+    # 初始化 --在做新的方法的时候，没有好的结果，初始化很重要******************
+    # 现在使用的何凯明的初始化方法
+    torch.nn.init.kaiming_normal_(w1)
+    torch.nn.init.kaiming_normal_(w2)
+    torch.nn.init.kaiming_normal_(w3)
+
+
+    # 网络函数
+    def forward(x):
+        x = x @ w1.t() + b1
+        x = F.relu(x)  # 使用了relu 整型的线性单元函数，结果为0或者x
+        x = x @ w2.t() + b2
+        x = F.relu(x)
+        x = x @ w3.t() + b3
+        x = F.relu(x)
+        return x
+
+
+    optimizer = optim.SGD([w1, b1, w2, b2, w3, b3],
+                        lr=learning_rate)  # torch 内置的迭代函数--优化器 https://www.jianshu.com/p/f8955dbc3553
+    criteon = nn.CrossEntropyLoss()  # 与F.cross_entropy 相同
+
+    for epoch in range(epochs):  # 数据训练 10次
+
+        for batch_idx, (data, target) in enumerate(train_loader):
+            data = data.view(-1, 28 * 28)  # 数据值
+
+            logits = forward(data)  # 网络层函数 加载数据后，得到分类值
+            loss = criteon(logits, target)  # 计算loss ，使用的是 交叉熵 值
+
+            optimizer.zero_grad()  # 优化器
+            loss.backward()  # 后向网络
+            # print(w1.grad.norm(), w2.grad.norm())
+            optimizer.step()  # 优化器迭代
+
+            if batch_idx % 100 == 0:
+                # Train Epoch: 9[40000 / 60000(67 %)] Loss: 0.083235
+                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(data), len(train_loader.dataset),
+                        100. * batch_idx / len(train_loader), loss.item()))
+
+        test_loss = 0
+        correct = 0
+        for data, target in test_loader:  # 测试数据
+            data = data.view(-1, 28 * 28)
+            logits = forward(data)  # 预测值
+            test_loss += criteon(logits, target).item()  # 交叉熵 叠加
+
+            pred = logits.data.max(1)[1]  # 预测值最大值
+            correct += pred.eq(target.data).sum()  # 预测值 与 测试值 是否eq相同，集合
+
+        test_loss /= len(test_loader.dataset)
+
+        # 平均loss，准确率
+        # Test set: Average loss: 0.0007, Accuracy: 9557 / 10000(95 %)
+        print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+            test_loss, correct, len(test_loader.dataset),
+            100. * correct / len(test_loader.dataset)))
+
+
+
+## 激活函数与GPU加速
+
+tanh函数，sigmoid函数
+
+![20210812113807.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812113807.png)
+
+RELU函数及其他形式：
+
+
+![20210812113952.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812113952.png)
+
+LeakyReLU：
+![20210812114638.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812114638.png)
+
+torch实现： 
+
+    F.leaky_relu()
+    nn.LeakyReLU(inplace=True)
+
+
+
+![20210812114726.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812114726.png)
+
+SERelu：
+![20210812133544.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812133544.png)
+
+gup加速：1.0后，更好实现了
+
+![20210812134116.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812134116.png)
+
+
+![20210812134713.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812134713.png)
+
+
+    device = torch.device('cuda:0') #gpu 加速 只有一个cuda显卡直接写为0
+    net = MLP().to(device)#gpu 加速
+    optimizer = optim.SGD(net.parameters(), lr=learning_rate)
+    criteon = nn.CrossEntropyLoss().to(device)#gpu 加速
+
+
+## test计算：
+
+不断的训练，导致结果不发生改变了，使用其他数据test时，会出现后面效果很差
+
+![20210812135805.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812135805.png)
+
+argmax 找到最大值的索引，eq进行比较计算，准确率：
+
+![20210812141740.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812141740.png)
+
+
+![20210812142102.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812142102.png)
+
+
+When to test
+test once per several batch 
+test once per epoch
+epoch V.S. step?
+何时测试
+
+每批次 测试一次
+每个代 测试一次
+
+![20210812144425.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812144425.png)
+
+    Epoch：
+    训练整个数据集的次数。
+    当一个完整的数据集通过了神经网络一次并且返回了一次，这个过程称为一次epoch。（也就是说，所有训练样本在神经网络中都进行了一次正向传播 和一次反向传播 ）
+
+    然而，当一个Epoch的样本（也就是所有的训练样本）数量可能太过庞大（对于计算机而言），就需要把它分成多个小块，也就是就是分成多个Batch 来进行训练。
+
+    Batch（批 / 一批样本）：
+    将整个训练样本分成若干个Batch。
+
+    Batch_Size（批大小）：
+    每批样本的大小。
+
+    Iteration（一次迭代）：
+    训练一个Batch就是一次Iteration（这个概念跟程序语言中的迭代器相似）。
+
+    举例
+    mnist 数据集有60000张图片作为训练数据，10000张图片作为测试数据。假设现在选择 Batch_Size = 100对模型进行训练。迭代30000次。
+
+    每个 Epoch 要训练的图片数量：60000 (训练集上的所有图像)
+    训练集具有的 Batch 个数：60000/100=600
+    每个 Epoch 需要完成的 Batch 个数：600
+    每个 Epoch 具有的 Iteration 个数：600（==batch，训练一次batch相当于迭代一次）
+    每个 Epoch 中发生模型权重更新的次数：600
+    训练 10 个Epoch后，模型权重更新的次数：600*10=6000
+    不同Epoch的训练，其实用的是同一个训练集的数据。第1个Epoch和第10个Epoch虽然用的都是训练集的60000张图片，但是对模型的权重更新值却是完全不同的。因为不同Epoch的模型处于代价函数空间上的不同位置，模型的训练代越靠后，越接近谷底，其代价越小。
+    总共完成30000次迭代，相当于完成了30000/600 = 50 个Epoch
+
+    链接：https://www.jianshu.com/p/45b1c4d30dbe https://www.jianshu.com/p/22c50ded4cf7
+
+
+## Visdom可视化：
+
+     pip install tensorboardX
+
+![20210812144736.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812144736.png)
+
+TensorboardX
+
+![20210812144914.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812144914.png)
+
+visdom：
+![20210812145142.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812145142.png)
+
+    安装
+
+    pip install visdom
+
+    运行
+
+    python -m visdom.server
+
+![20210812150056.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812150056.png)
+![20210812150133.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812150133.png)
+    有问题可以通过源码，安装
+
+![20210812150153.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812150153.png)
+
+    pip uninstall visdom
+    cd 到下载目录
+
+    //pip的执行
+
+    可以git clone到本地后进入文件夹
+
+    pip install -e .　安装
+
+    pip会自动将包复制到site-packages
+
+
+![20210812150310.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812150310.png)
+
+单条曲线：
+
+![20210812150918.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812150918.png)
+
+
+多条曲线：
+
+![20210812151739.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812151739.png)
+
+图片和文本的显示：
+
+![20210812152048.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812152048.png)
+
+
+![20210812152144.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812152144.png)
+
+
+## 过拟合和欠拟合：
+
+
+![20210812152833.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812152833.png)
+
+![20210812153106.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812153106.png)
+
+![20210812153209.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812153209.png)
+
+![20210812153356.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812153356.png)
+![20210812153516.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812153516.png)
+![20210812153640.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812153640.png)
+
+模型能力：model capacity
+
+![20210812153850.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812153850.png)
+
+![20210812153925.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812153925.png)
+
+
+欠拟合Underfitting：
+    的表现是
+    
+    在训练时和测试时， acc准确率不高，loss也不好
+
+![20210812154253.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812154253.png)
+
+过拟合：Overfitting
+
+     在训练时， acc准确率高，loss也好
+
+     但在测试时， acc准确率不高，loss也不好
+
+    所以泛化能力不好，一般性差
+
+![20210812154637.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812154637.png)
+
+![20210812154754.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812154754.png)
+
+
+![20210812154923.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812154923.png)
+
+![20210812155643.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812155643.png)
+
+
+## 交叉验证 K-fold cross-validation
+
+Train-Val-Test划分 固定划分： 训练集--验证集--测试集
+
+![20210812160130.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812160130.png)
+![20210812160327.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812160327.png)
+
+K-fold cross-validation：k-重交叉验证
+
+    把 训练集--验证集合并，划分为k份，顺序使用k-1份训练，1份验证，
+
+![20210812160806.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812160806.png)
+
+
+## 如何消除过拟合：
+
+
+![20210812163055.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812163055.png)
+
+![20210812163242.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812163242.png)
+
+how to reduce overfitting
+    More date ：更多的数据集
+    Constraint model complexity ：合适的模型能力
+        shallow
+        regularization
+    Dropout 
+    Data argumentation
+    Early Stopping
+
+![20210812163848.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812163848.png)
+这里讲一下
+
+regularization： 迫使参数的范数接近于0，减少模型复杂度。
+
+    https://blog.csdn.net/niuniu990/article/details/88567008
+
+![20210812164131.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812164131.png)
+
+
+regularization的类型：
+L1:1范数
+L2:2范数
+
+![20210812164244.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812164244.png)
+
+![20210812164852.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812164852.png)
+
+    regularization_loss=0
+    for param in model.parameters():
+        regularization_loss+=torch.sum(torch.abs(param))  #先求绝对值，再求和
+
+    classify_loss=criteon(logits,target)
+    loss=classify_loss+0.01*regularization_loss # L1 regularization
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+
+![20210812165025.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812165025.png)
+
+    device=torch.device('cuda:0')
+    net=MLP().to(device)
+    optimizer=optim.SCD(net.parameters(), lr=learning_rate, weight_decay=0.01) # L2 weight_decay
+    criteon=nn.CrossEntropyLoss().to(device)
+
+
+## 动量 momentum 与 学习率衰减 learning rate decay:
+
+![20210812165343.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812165343.png)
+
+动量 momentum:
+
+![20210812170544.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812170544.png)
+
+
+![20210812170702.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812170702.png)
+
+torch 实现：
+![20210812170848.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812170848.png)
+
+
+    optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.78) #直接指定momentum大小
+
+学习率衰减 learning rate decay:
+
+
+
+
+  
+
+
+
+
+
+
 
 
 

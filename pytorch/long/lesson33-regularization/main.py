@@ -17,6 +17,7 @@ train_loader = torch.utils.data.DataLoader(
                        # transforms.Normalize((0.1307,), (0.3081,))
                    ])),
     batch_size=batch_size, shuffle=True)
+
 test_loader = torch.utils.data.DataLoader(
     datasets.MNIST('../data', train=False, transform=transforms.Compose([
         transforms.ToTensor(),
@@ -47,7 +48,7 @@ class MLP(nn.Module):
 
 device = torch.device('cuda:0')
 net = MLP().to(device)
-optimizer = optim.SGD(net.parameters(), lr=learning_rate, weight_decay=0.01)
+optimizer = optim.SGD(net.parameters(), lr=learning_rate, weight_decay=0.01) #L2 regularization
 criteon = nn.CrossEntropyLoss().to(device)
 
 viz = Visdom()

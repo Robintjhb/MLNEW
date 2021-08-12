@@ -1,42 +1,46 @@
-import  torch
-import  torch.nn as nn
-import  torch.nn.functional as F
-import  torch.optim as optim
-from    torchvision import datasets, transforms
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torchvision import datasets, transforms
 
+batch_size = 200
+learning_rate = 0.01
+epochs = 10
 
-batch_size=200
-learning_rate=0.01
-epochs=10
-
+# 训练数据
 train_db = datasets.MNIST('../data', train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
-                   ]))
+                          transform=transforms.Compose([
+                              transforms.ToTensor(),
+                              transforms.Normalize((0.1307,), (0.3081,))
+                          ]))
 train_loader = torch.utils.data.DataLoader(
     train_db,
     batch_size=batch_size, shuffle=True)
 
+# 测试数据
 test_db = datasets.MNIST('../data', train=False, transform=transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.1307,), (0.3081,))
 ]))
 test_loader = torch.utils.data.DataLoader(test_db,
-    batch_size=batch_size, shuffle=True)
-
+                                          batch_size=batch_size, shuffle=True)
 
 print('train:', len(train_db), 'test:', len(test_db))
+
+# 做训练，验证集合 划分
 train_db, val_db = torch.utils.data.random_split(train_db, [50000, 10000])
 print('db1:', len(train_db), 'db2:', len(val_db))
+
+# 重新加载训练集
 train_loader = torch.utils.data.DataLoader(
     train_db,
     batch_size=batch_size, shuffle=True)
+
+# 验证集
 val_loader = torch.utils.data.DataLoader(
     val_db,
     batch_size=batch_size, shuffle=True)
-
-
 
 
 class MLP(nn.Module):
@@ -58,6 +62,7 @@ class MLP(nn.Module):
 
         return x
 
+
 device = torch.device('cuda:0')
 net = MLP().to(device)
 optimizer = optim.SGD(net.parameters(), lr=learning_rate)
@@ -65,8 +70,8 @@ criteon = nn.CrossEntropyLoss().to(device)
 
 for epoch in range(epochs):
 
-    for batch_idx, (data, target) in enumerate(train_loader):
-        data = data.view(-1, 28*28)
+    for batch_idx, (data, target) in enumerate(train_loader):  # 训练集
+        data = data.view(-1, 28 * 28)
         data, target = data.to(device), target.cuda()
 
         logits = net(data)
@@ -82,10 +87,9 @@ for epoch in range(epochs):
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                        100. * batch_idx / len(train_loader), loss.item()))
 
-
     test_loss = 0
     correct = 0
-    for data, target in val_loader:
+    for data, target in val_loader:  # 验证集
         data = data.view(-1, 28 * 28)
         data, target = data.to(device), target.cuda()
         logits = net(data)
@@ -100,10 +104,9 @@ for epoch in range(epochs):
         100. * correct / len(val_loader.dataset)))
 
 
-
 test_loss = 0
 correct = 0
-for data, target in test_loader:
+for data, target in test_loader:  # 测试集
     data = data.view(-1, 28 * 28)
     data, target = data.to(device), target.cuda()
     logits = net(data)

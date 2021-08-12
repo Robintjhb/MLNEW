@@ -5,9 +5,9 @@ import  torch.optim as optim
 from    torchvision import datasets, transforms
 
 
-batch_size=200
+batch_size=200 #每批多少
 learning_rate=0.01
-epochs=10
+epochs=10  #多少代
 
 train_loader = torch.utils.data.DataLoader(
     datasets.MNIST('../data', train=True, download=True,
