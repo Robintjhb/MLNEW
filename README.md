@@ -1927,7 +1927,21 @@ tain，test 方便转换：
     ![20210813171855.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813171855.png)
 
 
+    Data argumentation
+    ▪ Flip:翻转
 
+
+
+    ![20210813172712.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813172712.png)
+
+
+    ▪ Rotate：旋转
+
+    
+
+
+    ▪ Random Move & Crop：随机移动和裁剪
+    ▪ GAN：生成和分析网络
 
 
 
