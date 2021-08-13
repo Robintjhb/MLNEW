@@ -1285,12 +1285,243 @@ torch 实现：
 
     optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.78) #直接指定momentum大小
 
-学习率衰减 learning rate decay:
+学习率衰减 learning rate decay:设置一个动态的学习率
+
+![20210812172747.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812172747.png)
+
+![20210812172915.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812172915.png)
+
+![20210812173006.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812173006.png)
+
+方案：
+1.
+
+![20210812173144.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812173144.png)
+
+2.
+
+![20210812173220.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210812173220.png)
 
 
 
+Early Stopping：
 
+    即在每一个epoch结束时（一个epoch即对所有训练数据的一轮遍历）计算 validation data的accuracy，当accuracy不再提高时，就停止训练。这是很自然的做法，因为accuracy不再提高了，训练下去也没用。另外，这样做还能防止overfitting（过拟合）。
+
+    那么，怎么样才算是validation accuracy不再提高呢？并不是说validation accuracy一降下来，它就是“不再提高”，因为可能经过这个epoch后，accuracy降低了，但是随后的epoch又让accuracy升上去了，所以不能根据一两次的连续降低就判断“不再提高”。正确的做法是，在训练的过程中，记录最佳的validation accuracy，当连续10次epoch（或者更多次）没达到最佳accuracy时，你可以认为“不再提高”，此时使用early stopping。这个策略就叫“ no-improvement-in-n”，n即epoch的次数，可以根据实际情况取10、20、30….
+
+![20210813093151.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813093151.png)
+
+![20210813093744.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813093744.png)
+
+
+Dropout：
+
+![20210813094404.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813094404.png)
+
+当一个复杂的前馈神经网络被训练在小的数据集时，容易造成过拟合。为了防止过拟合，可以通过阻止特征检测器的共同作用来提高神经网络的性能。
+
+Dropout说的简单一点就是：我们在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作，这样可以使模型泛化性更强，因为它不会太依赖某些局部的特征，如图1所示
+
+![20210813094530.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813094530.png)
+
+![20210813094734.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813094734.png)
+
+![20210813094948.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813094948.png)
+
+添加了dropout后training和test部分不一样，需要人为的区分。
+
+![20210813095208.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813095208.png)
+
+    可以在网络层中直接调用dropout。
+    network = Sequential([layers.Dense(256, activation='relu'),
+
+                        layers.Dropout(0.5), # 0.5 rate to drop
+
+                        layers.Dense(128, activation='relu'),
+
+                        layers.Dropout(0.5), # 0.5 rate to drop
+
+                        layers.Dense(64, activation='relu'),
+                        layers.Dense(32, activation='relu'),
+
+                        layers.Dense(10)])
+
+        for step, (x,y) in enumerate(db):
+
+            with tf.GradientTape() as tape:
+                # [b, 28, 28] => [b, 784]
+                x = tf.reshape(x, (-1, 28*28))
+                # [b, 784] => [b, 10]
+                out = network(x, training=True)
+        
+        
+            #test
+            out = network(x, training=False)  
+
+
+为什么要batch 训练：
+
+stochastic 随机的, 并不是真的随机，符合某一分布
+deterministic 确定性
+
+![20210813095729.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813095729.png)
+
+![20210813100152.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813100152.png)
+    
+    为什么要batch 训练：
+
+        数据很大的时候,不可能整个数据集load到显存中，为了节省显存
+
+        stochastic gradient descent
+        不再是,求整个样本的loss对w的梯度，而是,求一个 batch 梯度
+
+![20210813100334.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813100334.png)
+![20210813100356.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813100356.png)
+
+
+## 卷积：
+
+### 什么是卷积：
+
+![20210813100632.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813100632.png)
+
+
+图片表示：黑白图片每张图的每个点表示了灰度值从0-255可以变换到0-1
+![20210813100804.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813100804.png)
+![20210813100712.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813100712.png)
+
+彩色图片三个通道：
+![20210813100921.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813100921.png)
+
+一层一般值的是权值w和输出是一层，三个隐藏层，一共是4层（一般input layer不算）
+多少参数就是有多少条线：
+
+![20210813101324.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813101324.png)
+
+局部相关性 感受野，感受不是全局的是一次一次小块：
+
+![20210813101500.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813101500.png)
+
+
+
+由此启发，对网络进行局部，相关性：
+
+
+卷积神经网络，卷积指的是局部相关性 ，并权值共享：
+取出，一个图片的中的局部，比如28x28的图片，取3x3，只做局部相关的连接
+
+![20210813101833.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813101833.png)
+
+![20210813102434.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813102434.png)
+
+![20210813102604.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813102604.png)
+
+卷积：滑动小窗口从28x28变成3x3参数大大降低
+本来有784条全连接的权值现在变成9个与之位置相关的位置权值，位置太远不考虑
+
+![20210813102903.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813102903.png)
+
+卷积层的权值数量会成倍减少，
+但是可以考虑到全局信息只是移动的时候是用的同样的参数，同时考虑了全局的属性但是又考虑了位置相近的信息，
+
+小窗口和大窗口做的是相乘再累加再的一个操作变成点，这叫卷积操作
+
+![20210813103241.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813103241.png)
+
+卷积函数：
+
+![20210813103516.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813103516.png)
+
+图片/信号 的 卷积操作：
+    G(x,h)=x*h
+    x坐标移动，乘以h，最后得到G
+
+
+锐化：
+
+![20210813103744.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813103744.png)
+
+模糊：
+![20210813104625.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813104625.png)
+
+边缘：
+![20210813104650.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813104650.png)
+
+卷积处理过程：
+
+![20210813104911.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813104911.png)
+
+## 卷积神经网络：
+
+[20210813104854.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813104854.png)
+
+![20210813105532.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813105532.png)
+
+![20210813111119.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813111119.png)
+
+基本名称概念：
+
+![20210813111716.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813111716.png)
+
+
+    input的通道数是多少，kernel的通道数也要是多少
+
+    x[1,3,28,28]  #一张图片 三个通道rgb 2828的大小
   
+    one k：[3,3,3] :第一个3是对应x的三个通道，后面是kernel的size33，如果input的channel是16 则kernel的channel也必须是16，必须和inut的channel是一一对应的
+    
+    multi-k：[16,3,3,3] 16表示一共有16个kernel，可能是不同类型的kernel比如edge、blur等等，第一个3表示是输入图片的通道RGB
+   
+    bias[16]:每个kernel会带一个偏置，所以16个kernel生成维度16的bias
+    
+    out：[1,16,26,26] #1表示几张图片就是batch，16和kernel的个数是对应的，2626输出图片的大小，这取决于padding的大小也有可能是2828
+    kernel也成为filter weight
+
+![20210813113210.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813113210.png)
+
+![20210813113749.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813113749.png)
+
+通过一系列的卷积操作，进行特征提取：
+
+![20210813114034.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813114034.png)
+
+
+torch 中实现：
+实现二维的卷积神经网络
+
+    layer=nn.Conv2d(1,3,kernel_size=3,stride=1,padding=0)
+    
+    #Conv2d:2d的函数卷积运算
+    1：一张图片
+    3：kernel的数量
+    kernel_size：kernel的大小，3x3
+    stride:移动的步长
+    padding：边缘补充的大小
+
+
+    #batch是1,3是ker个数,因为input_channel是3
+    #如果sride=2，就是隔一个看一个outputsize可能会折半，是一种降维的功能
+
+![20210813114951.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813114951.png)
+
+推荐直接写：layer(x)
+w和b是需要梯度信息的在kernel卷积的过程中会自动更新
+
+![20210813115256.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813115256.png)
+
+另一种写法：
+    F.conv2d
+
+![20210813115820.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813115820.png)
+
+
+池化层：
+
+
+
+
+
 
 
 
