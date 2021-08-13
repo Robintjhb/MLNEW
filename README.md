@@ -1454,6 +1454,7 @@ deterministic 确定性
 
 ## 卷积神经网络：
 
+### 卷积
 [20210813104854.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813104854.png)
 
 ![20210813105532.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813105532.png)
@@ -1516,7 +1517,428 @@ w和b是需要梯度信息的在kernel卷积的过程中会自动更新
 ![20210813115820.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813115820.png)
 
 
-池化层：
+### 池化层：pooling--完成降维，的操作
+
+pooling 下采样  把feature map变小，与图片缩小不太类似
+down sample：
+
+![20210813133554.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813133554.png)
+
+max pooling：每个卷积，取最大值，
+
+![20210813133726.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813133726.png)
+
+arg pooling：平均取样
+
+![20210813133948.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813133948.png)
+
+![20210813134122.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813134122.png)
+
+    torch中的实现：
+        import torch
+        import numpy as np
+        from torch.nn import functional as F  # 函数接口
+        import torch.nn as nn  # 函数接口
+
+        x = torch.randn(1, 16, 14, 14)
+        layer = nn.MaxPool2d(2, stride=2) #n.MaxPool2d
+
+        out = layer(x)
+        print(out.shape) # torch.Size([1, 16, 7, 7])
+
+        out = F.avg_pool2d(x, 2, stride=2) #F.avg_pool2d
+
+        print(out.shape) # torch.Size([1, 16, 7, 7])
+
+![20210813134354.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813134354.png)
+
+
+### upsample：上采样--F.interpolate
+
+![20210813132947.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813132947.png)
+
+![20210813135524.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813135524.png)
+
+    实现:
+    上采样F.interpolate
+
+    out = F.interpolate(x, scale_factor=2, mode='nearest')  # 放大2倍，nearest就是采用临近复制的模式，channel通道不会改变
+
+
+
+![20210813135643.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813135643.png)
+
+### ReLU:激活函数
+
+一个简单的unit神经元单元一般是 conv2d- batch_normalization - pooling -relu
+relu函数加在feature_map上的效应：
+ 把feature_map中负的单元给去掉，把相应低的点去掉，如图圈起来的相应太低，把该部分像素点变成0
+
+![20210813140050.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813140050.png)
+
+    layer=nn.ReLu(inplace=True) #inplace=True 表示x->x’的过程，x’使用的是x的内存空间节省内存
+    之后会发现out最小值都变成0，因为负数都被过滤了
+
+![20210813140320.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813140320.png)
+
+    
+        layer=nn.ReLU(inplace=True)  # inplace=True使用变量的内存空间,ReLU: out最小值都变成0，因为负数都被过滤了
+        out=layer(x)
+        print(out.shape) # torch.Size([1, 16, 28, 28])
+        # print(x) # torch.Size([1, 16, 28, 28])
+        print(out) # torch.Size([1, 16, 28, 28])
+
+        总的：
+
+        import torch
+        import numpy as np
+        from torch.nn import functional as F  # 函数接口
+        import torch.nn as nn  # 函数接口
+
+        x = torch.randn(1, 16, 14, 14)
+        layer = nn.MaxPool2d(2, stride=2) #n.MaxPool2d
+
+        out = layer(x)
+        print(out.shape) # torch.Size([1, 16, 7, 7])
+
+        out = F.avg_pool2d(x, 2, stride=2) #F.avg_pool2d
+
+        print(out.shape) # torch.Size([1, 16, 7, 7])
+
+        out = F.interpolate(x, scale_factor=2, mode='nearest')  # 放大2倍，nearest就是采用临近复制的模式，channel通道不会改变
+
+        print(out.shape) # torch.Size([1, 16, 28, 28])
+
+        layer=nn.ReLU(inplace=True)  # inplace=True使用变量的内存空间,ReLU: out最小值都变成0，因为负数都被过滤了
+        out=layer(x)
+        print(out.shape) # torch.Size([1, 16, 28, 28])
+        # print(x) # torch.Size([1, 16, 28, 28])
+        print(out) # torch.Size([1, 16, 28, 28])
+
+
+### BatchNorm： batch_normalization  批规范化-->批量正态分布
+
+当正负无穷的时候，导数为趋近于0，神经网络学习很慢，https://blog.csdn.net/baidu_35231778/article/details/116157145
+
+
+![20210813141407.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813141407.png)
+
+不是正态分布时候，不同起始点，找到最优解的路径不同：
+
+![20210813142019.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813142019.png)
+
+图片标准正态分布：
+![20210813142625.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813142625.png)
+
+BatchNorm  批规范化-->批量正态分布：
+
+![20210813143651.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813143651.png)
+
+![20210813143956.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813143956.png)
+
+    torch 实现：
+
+![20210813144354.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813144354.png)
+
+    # BatchNorm  批规范化-->批量正态分布：
+
+    x = torch.rand(100, 16, 784)
+    layer = nn.BatchNorm1d(16) # BatchNorm
+    out = layer(x)
+
+    print(layer.running_mean)
+    print(layer.running_var)
+
+计算过程：
+
+![20210813145028.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813145028.png)
+
+2d实现：
+
+![20210813145301.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813145301.png)
+![20210813150529.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813150529.png)
+
+        
+    # 二维直接使用.BatchNorm2d
+    # 因为Batch Norm的参数直接是由channel数量得来的，
+    # 因此这里直接给定了channel的数量为16，后续会输出16个channel的统计信息
+    layer = nn.BatchNorm2d(16)
+
+
+    out = layer(x)
+
+
+    # 进行权值计算并输出
+    print(layer.weight)
+    print(layer.bias)
+
+
+    print(layer.running_mean)
+    print(layer.running_var)
+
+
+
+test的时候，不使用，需要设置layer.evl()
+
+![20210813150758.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813150758.png)
+
+    layer.eval() # test的时候，不使用，需要设置layer.evl()
+
+    # 调用不同的模式，以完成参数是否自动更新学习
+    BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+
+效果：往0，1靠近
+收敛速度更快，效果好，更稳定，调整超参数，可以更大：
+使用了Batch Norm后，收敛速度加快、精度提高。
+
+上右图可看出尖峰的偏差对比左侧变小了很多。
+
+![20210813151218.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813151218.png)
+![20210813151403.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813151403.png)
+
+
+## 经典卷积神经网络：CNN
+
+近期发展： https://www.bilibili.com/video/BV1U54y1E7i6?p=68
+
+![20210813151631.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813151631.png)
+
+LeNet-5:
+
+![20210813152021.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813152021.png)
+AlexNet：使用了max pooling，relu，dropout
+
+![20210813152506.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813152506.png)
+
+VGG:使用了更小的kennel：3x3,1x1..
+
+![20210813152821.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813152821.png)
+
+1x1 Convolution:
+
+    通过1×1的卷积我们就可以对原始图片做一个变换，得到一张新的图片，从而可以提高泛化的能力减小过拟合,同时在这个过程中根据所选用的1×1卷积和filter的数目不同，可以实现跨通道的交互和信息的整合，而且还可以改变图片的维度.而且因为通过对维度的操作，虽然网络的层数增加了，但是网络的参数却可以大大减小，节省计算量。
+
+![20210813153026.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813153026.png)
+
+GoogLeNet
+
+![20210813153725.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813153725.png)
+![20210813153838.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813153838.png)
+
+简单堆叠，不能得到好的效果：
+![20210813154036.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813154036.png)
+
+
+## ResNet：深度残差网络：
+
+![20210813154243.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813154243.png)
+
+残差网络 是由来自Microsoft Research的4位学者提出的卷积神经网络，
+在2015年的ImageNet大规模视觉识别竞赛（ImageNet Large Scale Visual Recognition Challenge, ILSVRC）中
+获得了图像分类和物体识别的优胜。
+残差网络的特点是容易优化，并且能够通过增加相当的深度来提高准确率。
+其内部的残差块使用了跳跃连接，缓解了 在深度神经网络中增加深度 带来的梯度消失问题 
+
+https://blog.csdn.net/qq_37554556/article/details/115057394
+
+
+![20210813154900.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813154900.png)
+
+![20210813155145.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813155145.png)
+
+![20210813155502.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813155502.png)
+
+提升效果：
+![20210813155619.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813155619.png)
+
+![20210813160010.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813160010.png)
+
+变种与发展：
+![20210813160345.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813160345.png)
+
+resnet torch实现：
+
+![20210813161030.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813161030.png)
+
+    代码后续写。。这个还是具体实现理解
+
+
+DenseNet：每一层都与初始层相关，获取更多的信息
+
+![20210813161215.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813161215.png)
+
+## nn.Module：
+
+ 每一个层都继承了nn.Module：,可以使用求解每个层的模块
+
+![20210813161914.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813161914.png)
+
+![20210813162414.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813162414.png)
+
+nn.Sequential：
+
+![20210813162655.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813162655.png)
+
+ nn.Parameter：参数设置：
+
+![20210813164525.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813164525.png)
+
+包含了所有节点 及 子 模块：
+
+![20210813164958.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813164958.png)
+
+
+![20210813165344.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813165344.png)
+
+.device:方便的, 选择gpu
+
+![20210813165610.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813165610.png)
+
+load and save :方便的加载之前的训练状态，方便的保存当前训练状态
+
+
+![20210813165821.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813165821.png)
+
+        
+        net.load_state_dict(torch.load('ckpt.mdl'))
+
+
+        torch.save(net.state_dict(), 'ckpt.mdl')
+
+tain，test 方便转换：
+
+![20210813170132.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813170132.png)
+
+        
+    def main():
+        device = torch.device('cuda')
+        net = Net()
+        net.to(device)
+
+        net.train()
+
+        net.eval()
+
+        # net.load_state_dict(torch.load('ckpt.mdl'))
+        #
+        #
+        # torch.save(net.state_dict(), 'ckpt.mdl')
+
+        for name, t in net.named_parameters():
+            print('parameters:', name, t.shape)
+
+        for name, m in net.named_children():
+            print('children:', name, m)
+
+        for name, m in net.named_modules():
+            print('modules:', name, m)
+
+
+    if __name__ == '__main__':
+        main()
+
+
+
+
+
+自定义类：
+
+        
+    class BasicNet(nn.Module):
+
+        def __init__(self):
+            super(BasicNet, self).__init__()
+
+            self.net = nn.Linear(4, 3)
+
+        def forward(self, x):
+            return self.net(x)
+
+
+    class Net(nn.Module):
+
+        def __init__(self):
+            super(Net, self).__init__()
+
+            self.net = nn.Sequential(BasicNet(),
+                                    nn.ReLU(),
+                                    nn.Linear(3, 2))
+
+        def forward(self, x):
+            return self.net(x)
+
+
+
+
+
+![20210813170911.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813170911.png)
+
+            
+        class Flatten(nn.Module):
+
+            def __init__(self):
+                super(Flatten, self).__init__()
+
+            def forward(self, input):
+                return input.view(input.size(0), -1)
+
+
+        class TestNet(nn.Module):
+
+            def __init__(self):
+                super(TestNet, self).__init__()
+
+                self.net = nn.Sequential(nn.Conv2d(1, 16, stride=1, padding=1),
+                                        nn.MaxPool2d(2, 2),
+                                        Flatten(),# 打平操作
+                                        nn.Linear(1 * 14 * 14, 10))
+
+            def forward(self, x):
+                return self.net(x)
+
+
+
+![20210813171136.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813171136.png)
+
+        
+    class MyLinear(nn.Module): #自定义类
+
+        def __init__(self, inp, outp):
+            super(MyLinear, self).__init__()
+
+            # requires_grad = True
+            self.w = nn.Parameter(torch.randn(outp, inp)) #添加到Parameter中
+            self.b = nn.Parameter(torch.randn(outp))
+
+        def forward(self, x):
+            x = x @ self.w.t() + self.b
+            return x
+
+
+## 数据增强 Data argumentation
+
+    Limited Data：有限数据下
+    Small network capacity：减小网络
+
+    Regularization：回归化，固化
+
+    Data argumentation：人为数据增强
+
+    ![20210813171855.png](https://raw.githubusercontent.com/Robintjhb/mypicgoformd/main/img/20210813171855.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

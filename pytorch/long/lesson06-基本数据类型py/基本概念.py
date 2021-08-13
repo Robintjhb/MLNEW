@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from torch.nn import functional as F  # 函数接口
+import torch.nn as nn  # 函数接口
 
 # 张量 概念
 
@@ -438,3 +439,33 @@ ce1 = F.nll_loss(pred_log, torch.tensor([3]))
 print(ce1)
 ce2 = F.cross_entropy(logits, torch.tensor([3]))
 print(ce2)
+
+# BatchNorm  批规范化-->批量正态分布：
+
+x = torch.rand(100, 16, 784)
+layer = nn.BatchNorm1d(16) # BatchNorm
+out = layer(x)
+
+print(layer.running_mean)
+print(layer.running_var)
+
+# 二维 BatchNorm2d
+
+x = torch.rand(1, 16, 28, 28)  # 这里是28*28的数据
+
+# 二维直接使用.BatchNorm2d
+# 因为Batch Norm的参数直接是由channel数量得来的，
+# 因此这里直接给定了channel的数量为16，后续会输出16个channel的统计信息
+layer = nn.BatchNorm2d(16)
+
+
+out = layer(x)
+
+
+# 进行权值计算并输出
+print("进行权值计算并输出:",layer.weight)
+print(layer.bias)
+
+
+print(layer.running_mean)
+print(layer.running_var)
